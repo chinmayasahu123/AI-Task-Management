@@ -75,16 +75,49 @@ export function createRateLimiter({
   }
 }
 
-export function createOriginGuard(allowedOrigins) {
-  const allowed = new Set(
-    Array.from(allowedOrigins ?? []).map((origin) => String(origin).trim().replace(/\/+$/, ''))
+export function isOriginAllowed(origin, allowedOrigins) {
+  if (!origin) return true
+  const normalizedOrigin = String(origin).trim().replace(/\/+$/, '').toLowerCase()
+  const allowedList = Array.from(allowedOrigins ?? []).map((o) =>
+    String(o).trim().replace(/\/+$/, '').toLowerCase()
   )
+
+  for (const allowed of allowedList) {
+    if (!allowed) continue
+    if (allowed === normalizedOrigin) return true
+    if (allowed.includes('*')) {
+      const parts = allowed.split('*').map((s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'))
+      const regex = new RegExp(`^${parts.join('.*')}$`)
+      if (regex.test(normalizedOrigin)) return true
+    }
+  }
+
+  try {
+    const originUrl = new URL(normalizedOrigin.startsWith('http') ? normalizedOrigin : `https://${normalizedOrigin}`)
+    if (originUrl.hostname.endsWith('.vercel.app')) {
+      const hasVercelConfigured = allowedList.some((allowed) => allowed.includes('.vercel.app'))
+      if (
+        hasVercelConfigured ||
+        originUrl.hostname.includes('ai-task-management') ||
+        originUrl.hostname.includes('chinmaya-sahu')
+      ) {
+        return true
+      }
+    }
+  } catch {
+    // Malformed origin URL
+  }
+
+  return false
+}
+
+export function createOriginGuard(allowedOrigins) {
   const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS'])
 
   return function verifyRequestOrigin(request, _response, next) {
     const rawOrigin = request.get('origin')
     const origin = rawOrigin ? String(rawOrigin).trim().replace(/\/+$/, '') : rawOrigin
-    if (!safeMethods.has(request.method) && origin && !allowed.has(origin)) {
+    if (!safeMethods.has(request.method) && origin && !isOriginAllowed(origin, allowedOrigins)) {
       next(new HttpError(403, 'Request origin is not allowed.'))
       return
     }

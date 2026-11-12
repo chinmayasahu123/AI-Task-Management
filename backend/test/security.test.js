@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { createOriginGuard, createRateLimiter } from '../src/security.js'
+import { createOriginGuard, createRateLimiter, isOriginAllowed } from '../src/security.js'
 import { HttpError } from '../src/tasks/validation.js'
 
 function runMiddleware(middleware, request) {
@@ -39,7 +39,7 @@ test('rate limiter keeps independent client buckets within its memory cap', () =
 })
 
 test('origin guard allows safe requests and configured same-site writes', () => {
-  const guard = createOriginGuard(['http://localhost:5173/'])
+  const guard = createOriginGuard(['http://localhost:5173/', 'https://ai-task-management.vercel.app'])
   const invoke = (method, origin) => runMiddleware(guard, {
     method,
     get: (name) => name === 'origin' ? origin : undefined,
@@ -49,7 +49,17 @@ test('origin guard allows safe requests and configured same-site writes', () => 
   assert.equal(invoke('POST', undefined), undefined)
   assert.equal(invoke('POST', 'http://localhost:5173'), undefined)
   assert.equal(invoke('POST', 'http://localhost:5173/'), undefined)
+  assert.equal(invoke('POST', 'https://ai-task-management-l9c9jfixs-chinmaya-sahus-projects-cc3ed8fe.vercel.app'), undefined)
   assert.equal(invoke('PATCH', 'https://untrusted.example')?.status, 403)
+})
+
+test('isOriginAllowed supports exact match, wildcards, and vercel preview domains', () => {
+  assert.equal(isOriginAllowed(undefined, []), true)
+  assert.equal(isOriginAllowed('http://localhost:5173', ['http://localhost:5173']), true)
+  assert.equal(isOriginAllowed('https://preview-1.vercel.app', ['https://*.vercel.app']), true)
+  assert.equal(isOriginAllowed('https://ai-task-management-abc123-chinmaya-sahus-projects.vercel.app', ['https://ai-task-management.vercel.app']), true)
+  assert.equal(isOriginAllowed('https://ai-task-management-l9c9jfixs-chinmaya-sahus-projects-cc3ed8fe.vercel.app', ['http://localhost:5173']), true)
+  assert.equal(isOriginAllowed('https://malicious-site.example', ['https://ai-task-management.vercel.app']), false)
 })
 
 test('rate limiter rejects invalid configuration', () => {

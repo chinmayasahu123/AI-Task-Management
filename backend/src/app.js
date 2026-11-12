@@ -10,7 +10,7 @@ import noteRoutes from './notes/routes.js'
 import teamRoutes from './teams/routes.js'
 import userRoutes from './users/routes.js'
 import productivityRoutes from './productivity/routes.js'
-import { createOriginGuard } from './security.js'
+import { createOriginGuard, isOriginAllowed } from './security.js'
 import multer from 'multer'
 import { getRedis, redis } from './redis.js'
 import { metricsMiddleware, metricsResponse } from './metrics.js'
@@ -42,7 +42,14 @@ app.use((request, response, next) => {
   if (request.path.startsWith('/api/')) response.set('Cache-Control', 'no-store')
   next()
 })
-app.use(cors({ origin: allowedOrigins, credentials: true }))
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      callback(null, isOriginAllowed(origin, allowedOrigins))
+    },
+    credentials: true,
+  })
+)
 app.use(createOriginGuard(allowedOrigins))
 app.use(express.json({ limit: '32kb' }))
 app.use(metricsMiddleware)
