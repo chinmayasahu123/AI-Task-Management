@@ -39,7 +39,7 @@ test('rate limiter keeps independent client buckets within its memory cap', () =
 })
 
 test('origin guard allows safe requests and configured same-site writes', () => {
-  const guard = createOriginGuard(['http://localhost:5173'])
+  const guard = createOriginGuard(['http://localhost:5173/'])
   const invoke = (method, origin) => runMiddleware(guard, {
     method,
     get: (name) => name === 'origin' ? origin : undefined,
@@ -48,6 +48,7 @@ test('origin guard allows safe requests and configured same-site writes', () => 
   assert.equal(invoke('GET', 'https://untrusted.example'), undefined)
   assert.equal(invoke('POST', undefined), undefined)
   assert.equal(invoke('POST', 'http://localhost:5173'), undefined)
+  assert.equal(invoke('POST', 'http://localhost:5173/'), undefined)
   assert.equal(invoke('PATCH', 'https://untrusted.example')?.status, 403)
 })
 

@@ -18,7 +18,7 @@ import { metricsMiddleware, metricsResponse } from './metrics.js'
 const app = express()
 const configuredOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean)
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? configuredOrigins

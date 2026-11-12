@@ -76,11 +76,14 @@ export function createRateLimiter({
 }
 
 export function createOriginGuard(allowedOrigins) {
-  const allowed = new Set(allowedOrigins)
+  const allowed = new Set(
+    Array.from(allowedOrigins ?? []).map((origin) => String(origin).trim().replace(/\/+$/, ''))
+  )
   const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS'])
 
   return function verifyRequestOrigin(request, _response, next) {
-    const origin = request.get('origin')
+    const rawOrigin = request.get('origin')
+    const origin = rawOrigin ? String(rawOrigin).trim().replace(/\/+$/, '') : rawOrigin
     if (!safeMethods.has(request.method) && origin && !allowed.has(origin)) {
       next(new HttpError(403, 'Request origin is not allowed.'))
       return
