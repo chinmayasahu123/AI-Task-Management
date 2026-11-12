@@ -252,14 +252,13 @@ router.get('/', async (request, response) => {
   const cursorSql = cursor ? 'AND (tasks.updated_at < ? OR (tasks.updated_at = ? AND tasks.id < ?))' : ''
   const values = [request.user.id, request.user.id, request.user.id]
   if (cursor) values.push(cursor.timestamp, cursor.timestamp, cursor.id)
-  if (paginated) values.push(limit + 1)
   const [rows] = await pool.execute(
     `SELECT ${taskColumns}
      FROM tasks
      ${taskJoins}
      WHERE ${visibleTask}
      ${cursorSql}
-     ORDER BY tasks.updated_at DESC, tasks.id DESC${paginated ? ' LIMIT ?' : ''}`,
+     ORDER BY tasks.updated_at DESC, tasks.id DESC${paginated ? ` LIMIT ${limit + 1}` : ''}`,
     values,
   )
   const hasMore = paginated && rows.length > limit

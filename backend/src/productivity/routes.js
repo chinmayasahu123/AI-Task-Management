@@ -13,7 +13,7 @@ router.get('/activity', async (request, response) => {
     e.task_id AS taskId, e.team_id AS teamId, users.name AS actorName
     FROM activity_events e JOIN users ON users.id=e.actor_id
     WHERE e.actor_id=? OR e.team_id IN (SELECT team_id FROM team_members WHERE user_id=?)
-    ORDER BY e.created_at DESC, e.id DESC LIMIT ?`, [request.user.id, request.user.id, limit])
+    ORDER BY e.created_at DESC, e.id DESC LIMIT ${limit}`, [request.user.id, request.user.id])
   response.json({ activity: rows })
 })
 
