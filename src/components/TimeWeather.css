@@ -1,0 +1,141 @@
+.time-weather {
+  display: inline-flex;
+  min-width: 154px;
+  height: 39px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  padding: 0 12px;
+  border: 1px solid #e8edf5;
+  border-radius: 999px;
+  color: #647087;
+  background: #fff;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.time-weather-clock,
+.time-weather-conditions,
+.time-weather-loading {
+  display: inline-flex;
+  align-items: center;
+}
+
+.time-weather-clock {
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-weather-clock time {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.time-weather-divider {
+  width: 1px;
+  height: 20px;
+  background: #e6ebf2;
+}
+
+.time-weather-conditions {
+  gap: 6px;
+  color: #d29a36;
+}
+
+.time-weather-copy {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+}
+
+.time-weather-copy strong {
+  color: #3a4558;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.time-weather-copy > span,
+.time-weather-loading > span {
+  color: #7d8798;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.time-weather-loading {
+  gap: 6px;
+  color: #d29a36;
+}
+
+.time-weather-error {
+  cursor: pointer;
+}
+
+.time-weather-error:hover {
+  border-color: #b6c8e8;
+  background: #f5f8fe;
+}
+
+.app-shell[data-theme='dark'] .time-weather {
+  border-color: #2a3850;
+  color: #c7d4e8;
+  background: #172338;
+}
+
+.app-shell[data-theme='dark'] .time-weather-divider {
+  background: #34445d;
+}
+
+.app-shell[data-theme='dark'] .time-weather-copy strong {
+  color: #e7edf7;
+}
+
+.app-shell[data-theme='dark'] .time-weather-copy > span,
+.app-shell[data-theme='dark'] .time-weather-loading > span {
+  color: #a4b3c9;
+}
+
+.app-shell[data-theme='dark'] .time-weather-error:hover {
+  border-color: #496796;
+  background: #203351;
+}
+
+@media (max-width: 520px) {
+  .time-weather {
+    min-width: 0;
+    height: 34px;
+    gap: 6px;
+    padding: 0 7px;
+  }
+
+  .time-weather-clock,
+  .time-weather-conditions {
+    gap: 4px;
+  }
+
+  .time-weather-clock time,
+  .time-weather-copy strong {
+    font-size: 9px;
+  }
+
+  .time-weather-clock svg,
+  .time-weather-conditions svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .time-weather-copy > span {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .time-weather {
+    gap: 4px;
+    padding: 0 5px;
+  }
+
+  .time-weather-clock,
+  .time-weather-conditions {
+    gap: 3px;
+  }
+}

@@ -1,0 +1,114 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in the root .env file}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-task_management}
+      MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in the root .env file}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in the root .env file}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    profiles: ["maintenance"]
+    build:
+      context: ./backend
+    command: ["node", "migrate.js"]
+    restart: "no"
+    environment: &backend_environment
+      NODE_ENV: production
+      PORT: 3001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in the root .env file}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in the root .env file}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-task_management}
+      MYSQL_CONNECTION_LIMIT: ${MYSQL_CONNECTION_LIMIT:-10}
+      MYSQL_QUEUE_LIMIT: ${MYSQL_QUEUE_LIMIT:-100}
+      MYSQL_CONNECT_TIMEOUT_MS: ${MYSQL_CONNECT_TIMEOUT_MS:-10000}
+      MYSQL_MAX_IDLE: ${MYSQL_MAX_IDLE:-10}
+      MYSQL_IDLE_TIMEOUT_MS: ${MYSQL_IDLE_TIMEOUT_MS:-60000}
+      REDIS_URL: redis://redis:6379
+      REDIS_REQUIRED: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      <<: *backend_environment
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      TRUST_PROXY_HOPS: 1
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-10}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+    command: ["node", "worker.js"]
+    restart: unless-stopped
+    environment:
+      <<: *backend_environment
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
+  redis_data:
+  prometheus_data:

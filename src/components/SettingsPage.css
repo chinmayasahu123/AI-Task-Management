@@ -1,0 +1,89 @@
+.settings-page { display: grid; gap: 18px; }
+.settings-profile-card,
+.settings-preferences { padding: 20px; }
+.settings-profile-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.settings-profile-heading h2,
+.settings-preferences h2,
+.settings-section-heading h2 { margin: 0; color: #29354a; font-size: 16px; font-weight: 750; }
+.settings-profile-heading p:last-child,
+.settings-preferences p:last-child,
+.settings-section-heading p:last-child { margin: 5px 0 0; color: #8993a4; font-size: 10px; }
+.settings-profile-details { display: grid; grid-template-columns: 100px repeat(3, minmax(0, 1fr)); align-items: center; gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #edf0f4; }
+.avatar.settings-profile-avatar { width: 88px; height: 88px; border-width: 3px; font-size: 24px; }
+.settings-profile-photo-button { display: grid; width: 92px; height: 92px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: zoom-in; }
+.settings-profile-photo-button:hover .settings-profile-avatar { box-shadow: 0 0 0 4px rgba(75, 123, 197, 0.16); }
+.settings-profile-field { display: grid; min-width: 0; gap: 6px; }
+.settings-profile-field span { color: #8993a4; font-size: 9px; font-weight: 650; }
+.settings-profile-field strong { overflow: hidden; color: #344057; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.settings-preferences { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.settings-theme-button { display: flex; min-width: 250px; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e5eaf1; border-radius: 10px; color: #47566d; background: #fbfcfe; cursor: pointer; text-align: left; }
+.settings-theme-button:hover { border-color: #b8c9e4; background: #f5f8fc; }
+.settings-theme-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 9px; color: #557dbb; background: #eaf1fc; }
+.settings-theme-button > span:nth-child(2) { display: grid; flex: 1; gap: 3px; }
+.settings-theme-button strong { color: #344057; font-size: 10px; }
+.settings-theme-button small { color: #8993a4; font-size: 8px; }
+.settings-toggle { display: flex; width: 30px; height: 17px; align-items: center; padding: 2px; border-radius: 20px; background: #c5cedb; transition: background 150ms ease; }
+.settings-toggle i { width: 13px; height: 13px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(20, 35, 57, 0.2); transition: transform 150ms ease; }
+.settings-toggle.is-on { background: #4c7dcc; }
+.settings-toggle.is-on i { transform: translateX(13px); }
+.settings-features-section { display: grid; gap: 13px; }
+.settings-section-heading h2 { font-size: 17px; }
+.settings-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.settings-feature-card { display: flex; min-width: 0; align-items: flex-start; gap: 11px; padding: 15px; border: 1px solid #e8edf3; border-radius: 11px; background: #fff; box-shadow: 0 2px 7px rgba(19, 40, 73, 0.025); }
+.settings-feature-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 9px; color: #4b7bc5; background: #edf3ff; }
+.settings-feature-1 .settings-feature-icon { color: #6d67bd; background: #f1efff; }
+.settings-feature-2 .settings-feature-icon { color: #318c75; background: #e8f6f1; }
+.settings-feature-3 .settings-feature-icon { color: #bd7f31; background: #fff4e4; }
+.settings-feature-4 .settings-feature-icon { color: #437aa9; background: #eaf4fb; }
+.settings-feature-5 .settings-feature-icon { color: #9067c4; background: #f3edfb; }
+.settings-feature-card h3 { margin: 1px 0 5px; color: #344057; font-size: 10px; font-weight: 750; }
+.settings-feature-card p { margin: 0; color: #8490a2; font-size: 9px; line-height: 1.55; }
+.settings-photo-backdrop { position: fixed; z-index: 12; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(10, 20, 36, 0.55); backdrop-filter: blur(5px); }
+.settings-photo-preview { position: relative; display: flex; width: fit-content; max-width: calc(100vw - 40px); height: fit-content; max-height: calc(100vh - 40px); align-items: center; justify-content: center; padding: 20px; border: 1px solid #e4eaf2; border-radius: 16px; background: #fff; box-shadow: 0 25px 70px rgba(10, 20, 36, 0.24); }
+.settings-photo-preview > .icon-button { position: absolute; top: 9px; right: 9px; }
+.settings-photo-large { width: 250px; height: 250px; border-width: 4px; font-size: 52px; }
+.settings-photo-full { display: block; max-width: min(75vw, 720px); max-height: min(78vh, 680px); width: auto; height: auto; border-radius: 8px; object-fit: contain; }
+.app-shell[data-theme='dark'] .settings-profile-heading h2,
+.app-shell[data-theme='dark'] .settings-preferences h2,
+.app-shell[data-theme='dark'] .settings-section-heading h2,
+.app-shell[data-theme='dark'] .settings-profile-field strong,
+.app-shell[data-theme='dark'] .settings-theme-button strong,
+.app-shell[data-theme='dark'] .settings-feature-card h3 { color: #e7edf7; }
+.app-shell[data-theme='dark'] .settings-profile-heading p:last-child,
+.app-shell[data-theme='dark'] .settings-preferences p:last-child,
+.app-shell[data-theme='dark'] .settings-section-heading p:last-child,
+.app-shell[data-theme='dark'] .settings-profile-field span,
+.app-shell[data-theme='dark'] .settings-theme-button small,
+.app-shell[data-theme='dark'] .settings-feature-card p { color: #9aa9c0; }
+.app-shell[data-theme='dark'] .settings-profile-details { border-color: #2a3850; }
+.app-shell[data-theme='dark'] .settings-theme-button,
+.app-shell[data-theme='dark'] .settings-feature-card { border-color: #2a3850; background: #182438; }
+.app-shell[data-theme='dark'] .settings-photo-preview { border-color: #34445e; background: #182438; }
+.app-shell[data-theme='dark'] .settings-theme-button:hover { border-color: #49668e; background: #1b2b43; }
+@media (max-width: 900px) { .settings-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) {
+  .settings-profile-heading,
+  .settings-preferences { align-items: flex-start; flex-direction: column; }
+  .settings-profile-details { grid-template-columns: 92px 1fr; }
+  .settings-profile-avatar { grid-row: span 3; }
+  .settings-theme-button { width: 100%; min-width: 0; }
+  .settings-feature-grid { grid-template-columns: 1fr; }
+}
+.settings-password-form { display:grid; gap:12px; padding:18px; }
+.settings-password-form h2 { margin:0 0 5px; color:#29364b; font-size:15px; }
+.settings-password-form p { margin:0; color:#8994a5; font-size:10px; }
+.settings-password-form label { display:grid; max-width:360px; gap:5px; color:#69768b; font-size:10px; }
+.settings-password-form input,.settings-delete-account input { box-sizing:border-box; width:100%; min-height:40px; padding:9px 11px; border:1px solid #dce3ed; border-radius:7px; color:#344057; background:#fff; font:inherit; font-size:12px; }
+.settings-password-form input:focus,.settings-delete-account input:focus { outline:0; border-color:#4385e8; box-shadow:0 0 0 3px rgba(67,133,232,.18); }
+.settings-password-form button { justify-self:start; min-height:34px; font-size:10px; }
+.settings-delete-account { display:grid; gap:12px; padding:18px; border-color:#f0dada; }
+.settings-delete-account h2 { margin:0 0 5px; color:#aa4e4e; font-size:15px; }
+.settings-delete-account p { margin:0; color:#929cad; font-size:10px; }
+.settings-delete-account label { display:grid; max-width:360px; gap:5px; color:#69768b; font-size:10px; }
+.settings-delete-account input { border-color:#ead6d6; }
+.settings-delete-account button { justify-self:start; }
+.app-shell[data-theme='dark'] .settings-password-form input,.app-shell[data-theme='dark'] .settings-delete-account input { border-color:#35445d; color:#e7edf7; background:#111c2d; }
+.app-shell[data-theme='dark'] .settings-delete-account input { border-color:#69494e; }
+.app-shell[data-theme='dark'] .settings-password-form input:focus,.app-shell[data-theme='dark'] .settings-delete-account input:focus { border-color:#5792f2; box-shadow:0 0 0 3px rgba(67,133,232,.24); }
+.app-shell[data-theme='dark'] .settings-password-form h2 { color:#e7edf7; }
+.app-shell[data-theme='dark'] .settings-password-form label,.app-shell[data-theme='dark'] .settings-delete-account label { color:#aab8ce; }

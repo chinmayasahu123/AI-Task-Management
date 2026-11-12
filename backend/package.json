@@ -1,0 +1,23 @@
+{
+  "name": "tracklap-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "migrate": "node migrate.js",
+    "worker": "node worker.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "bullmq": "^6.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "ioredis": "^6.0.0",
+    "multer": "^2.5.0",
+    "mysql2": "^3.14.4",
+    "prom-client": "^15.1.3"
+  }
+}

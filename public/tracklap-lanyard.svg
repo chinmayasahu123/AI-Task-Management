@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="720" viewBox="0 0 512 720">
+  <defs>
+    <linearGradient id="card" x2="1" y2="1">
+      <stop stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#dce8fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="720" rx="56" fill="url(#card)"/>
+  <circle cx="256" cy="96" r="24" fill="#9eb4d8"/>
+  <rect x="64" y="188" width="384" height="384" rx="70" fill="#13233c"/>
+  <path d="m171 380 57 57 115-140" fill="none" stroke="#90b4fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+  <text x="256" y="632" fill="#13233c" font-family="Arial,sans-serif" font-size="38" font-weight="700" text-anchor="middle" letter-spacing="3">TRACKLAP</text>
+</svg>

@@ -1,0 +1,42 @@
+groups:
+  - name: tracklap-api
+    rules:
+      - alert: TracklapApiUnavailable
+        expr: up{job="tracklap-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Tracklap API metrics endpoint is unavailable
+
+      - alert: TracklapApiHighErrorRate
+        expr: sum(rate(tracklap_http_requests_total{status_code=~"5.."}[5m])) / clamp_min(sum(rate(tracklap_http_requests_total[5m])), 0.001) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: More than 5% of API requests are returning server errors
+
+      - alert: TracklapApiHighLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(tracklap_http_request_duration_seconds_bucket[5m]))) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: API p95 latency is above one second
+
+      - alert: TracklapMysqlPoolQueueing
+        expr: max(tracklap_mysql_pool_connections{state="queued"}) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Requests are waiting for MySQL pool connections
+
+      - alert: TracklapBackgroundQueueBacklog
+        expr: sum(tracklap_background_jobs{state="waiting"}) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: More than 100 background jobs are waiting

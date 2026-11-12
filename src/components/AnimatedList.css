@@ -1,0 +1,3 @@
+.animated-list-motion-active {
+  will-change: opacity, transform;
+}
