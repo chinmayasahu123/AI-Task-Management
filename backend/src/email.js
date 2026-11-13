@@ -59,29 +59,30 @@ function getSmtpTransporter() {
 }
 
 export async function sendEmail({ to, subject, html, text }) {
-  const smtp = getSmtpTransporter()
-
-  if (smtp) {
+  // Option 1: Google Apps Script Web App (HTTPS Port 443 - 100% Free, sends to anyone)
+  const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  if (googleScriptUrl) {
     try {
-      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('resend.dev')
-        ? process.env.EMAIL_FROM
-        : `Tracklap <${smtp.user}>`
-
-      await smtp.transporter.sendMail({
-        from,
-        to,
-        subject,
-        html,
-        text,
+      const response = await fetch(googleScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, html, text }),
+        redirect: 'follow',
       })
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Google Script email failed:', response.status, errorText)
+        throw new HttpError(502, 'Could not send the email. Please try again later.')
+      }
       return
     } catch (error) {
-      console.error('SMTP email sending failed:', error)
-      throw new HttpError(502, 'Could not send the email. Please verify SMTP settings and try again.')
+      if (error instanceof HttpError) throw error
+      console.error('Google Script email connection error:', error)
+      throw new HttpError(502, 'Could not send the email. Please try again later.')
     }
   }
 
-  // Fallback to Resend if RESEND_API_KEY is configured
+  // Option 2: Resend API (HTTPS Port 443)
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.EMAIL_FROM
   if (apiKey && from) {
@@ -98,8 +99,30 @@ export async function sendEmail({ to, subject, html, text }) {
     return
   }
 
+  // Option 3: SMTP / nodemailer (if environment permits outbound SMTP ports)
+  const smtp = getSmtpTransporter()
+  if (smtp) {
+    try {
+      const fromAddress = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('resend.dev')
+        ? process.env.EMAIL_FROM
+        : `Tracklap <${smtp.user}>`
+
+      await smtp.transporter.sendMail({
+        from: fromAddress,
+        to,
+        subject,
+        html,
+        text,
+      })
+      return
+    } catch (error) {
+      console.error('SMTP email sending failed:', error)
+      throw new HttpError(502, 'Could not send the email. Please verify SMTP settings and try again.')
+    }
+  }
+
   throw new HttpError(
     503,
-    'Email delivery is not configured. Set EMAIL_USER and EMAIL_PASS (or RESEND_API_KEY and EMAIL_FROM).'
+    'Email delivery is not configured. Set GOOGLE_SCRIPT_URL, RESEND_API_KEY, or EMAIL_USER and EMAIL_PASS.'
   )
 }
