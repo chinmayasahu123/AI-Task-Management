@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer'
 import { HttpError } from './tasks/validation.js'
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character])
@@ -34,18 +35,71 @@ export function teamInvitationEmail(teamName, url) {
   }
 }
 
+let smtpTransporter = null
+
+function getSmtpTransporter() {
+  const user = process.env.EMAIL_USER || process.env.GMAIL_USER || process.env.SMTP_USER
+  const pass = process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS
+  if (!user || !pass) return null
+
+  if (!smtpTransporter) {
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com'
+    const port = Number(process.env.SMTP_PORT || (host === 'smtp.gmail.com' ? 465 : 587))
+    const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : port === 465
+
+    smtpTransporter = nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+    })
+  }
+
+  return { transporter: smtpTransporter, user }
+}
+
 export async function sendEmail({ to, subject, html, text }) {
+  const smtp = getSmtpTransporter()
+
+  if (smtp) {
+    try {
+      const from = process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('resend.dev')
+        ? process.env.EMAIL_FROM
+        : `Tracklap <${smtp.user}>`
+
+      await smtp.transporter.sendMail({
+        from,
+        to,
+        subject,
+        html,
+        text,
+      })
+      return
+    } catch (error) {
+      console.error('SMTP email sending failed:', error)
+      throw new HttpError(502, 'Could not send the email. Please verify SMTP settings and try again.')
+    }
+  }
+
+  // Fallback to Resend if RESEND_API_KEY is configured
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.EMAIL_FROM
-  if (!apiKey || !from) throw new HttpError(503, 'Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM.')
-  const result = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [to], subject, html, text }),
-  })
-  if (!result.ok) {
-    const detail = await result.text()
-    console.error('Email provider rejected a message:', result.status, detail)
-    throw new HttpError(502, 'Could not send the email. Please try again later.')
+  if (apiKey && from) {
+    const result = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [to], subject, html, text }),
+    })
+    if (!result.ok) {
+      const detail = await result.text()
+      console.error('Email provider rejected a message:', result.status, detail)
+      throw new HttpError(502, 'Could not send the email. Please try again later.')
+    }
+    return
   }
+
+  throw new HttpError(
+    503,
+    'Email delivery is not configured. Set EMAIL_USER and EMAIL_PASS (or RESEND_API_KEY and EMAIL_FROM).'
+  )
 }
