@@ -26,6 +26,7 @@ export default function TeamManagementPanel({ teams, isLoading, currentUser, onC
                   {String(team.leadId) === String(currentUser.id) && (
                     <>
                       <span className="team-lead-tag">Team lead</span>
+                      <button aria-label={`Add members to ${team.name}`} className="secondary-button" onClick={() => onEdit(team)} type="button">+ Add member</button>
                       <button aria-label={`Edit ${team.name}`} className="secondary-button" onClick={() => onEdit(team)} type="button">Edit</button>
                       <button aria-label={`Delete ${team.name}`} className="team-delete-button" onClick={() => onDelete(team)} type="button">Delete</button>
                     </>

@@ -276,10 +276,10 @@ const NotesPage = forwardRef(function NotesPage({ isDarkMode }, ref) {
                     tilt={0.35}
                     zoomOnClick={false}
                   >{folderNotes.length ? folderNotes.slice(0, 6).map((note, index) => <div className={`folder-note-preview note-color-${['yellow', 'peach', 'pink', 'mint', 'lavender'][index % 5]}`} key={note.id}><strong>{note.title}</strong><span>{note.content.slice(0, 85)}</span></div>) : <div className="folder-note-preview folder-note-empty">Drop a note here</div>}</Folder></div>
-                  <div className="notes-folder-meta"><div><h3>{folder.name}</h3><p>{folderNotes.length} {folderNotes.length === 1 ? 'note' : 'notes'}</p></div><div className="notes-folder-actions">
-                    <button className="notes-folder-add" aria-label={`Add note to ${folder.name}`} onClick={() => ref.current?.create(folder.id)} title="Add note" type="button"><Icon name="plus" size={14} /> Add note</button>
-                    <button className="notes-folder-edit" aria-label={`Edit ${folder.name}`} onClick={() => { setEditingFolder(folder); setIsFolderEditorOpen(true) }} title="Edit folder" type="button"><Icon name="settings" size={13} /> Edit</button>
-                    <button className="notes-folder-delete" aria-label={`Delete ${folder.name}`} onClick={() => deleteFolder(folder)} title="Delete folder" type="button"><Icon name="close" size={13} /> Delete</button>
+                  <div className="notes-folder-meta"><div className="notes-folder-info"><h3 title={folder.name}>{folder.name}</h3><p>{folderNotes.length} {folderNotes.length === 1 ? 'note' : 'notes'}</p></div><div className="notes-folder-actions">
+                    <button className="notes-folder-add" aria-label={`Add note to ${folder.name}`} onClick={() => ref.current?.create(folder.id)} title="Add note" type="button"><Icon name="plus" size={13} /> <span>Note</span></button>
+                    <button className="notes-folder-edit" aria-label={`Edit ${folder.name}`} onClick={() => { setEditingFolder(folder); setIsFolderEditorOpen(true) }} title="Edit folder" type="button"><Icon name="settings" size={13} /></button>
+                    <button className="notes-folder-delete" aria-label={`Delete ${folder.name}`} onClick={() => deleteFolder(folder)} title="Delete folder" type="button"><Icon name="close" size={13} /></button>
                   </div></div>
                 </article>
               })}

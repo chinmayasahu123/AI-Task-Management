@@ -278,6 +278,7 @@ export default function WorkspacePage({ user, isDarkMode, onToggleTheme, onLogou
   function openEditTeamModal(team) {
     setEditingTeam(team)
     setIsTeamModalOpen(true)
+    refreshUsers()
   }
 
   function openEditModal(task) {
@@ -294,10 +295,13 @@ export default function WorkspacePage({ user, isDarkMode, onToggleTheme, onLogou
       method: editingTeam ? 'PATCH' : 'POST',
       body: JSON.stringify(teamValues),
     })
-    if (!editingTeam && inviteEmails.length) await requestJson(`/api/teams/${result.team.id}/invitations`, { method:'POST', body:JSON.stringify({ emails:inviteEmails }) })
-    setTeams((existing) => (editingTeam
-      ? existing.map((team) => String(team.id) === String(result.team.id) ? result.team : team)
-      : [...existing, result.team]).sort((a, b) => a.name.localeCompare(b.name)))
+    if (inviteEmails.length) {
+      await requestJson(`/api/teams/${result.team.id}/invitations`, {
+        method: 'POST',
+        body: JSON.stringify({ emails: inviteEmails }),
+      })
+    }
+    await refreshTeams()
     setIsTeamModalOpen(false)
     setEditingTeam(null)
   }

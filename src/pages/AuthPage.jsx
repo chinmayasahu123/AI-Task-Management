@@ -13,6 +13,8 @@ export default function AuthPage({ initialError = '', initialMode = 'login', onC
   const [verificationCode, setVerificationCode] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [registrationTicket, setRegistrationTicket] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState(initialError)
   const [success, setSuccess] = useState('')
   const [toast, setToast] = useState('')
@@ -109,12 +111,33 @@ export default function AuthPage({ initialError = '', initialMode = 'login', onC
               <span>Email address</span>
               <input autoComplete="email" autoFocus={!isRegistering} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} />
             </label>}
-            {(!isRegistering&&!isForgotEmail&&!isForgotReset || isDetailsStep) && <label className="form-field">
+            {!isRegistering&&!isPasswordReset && <label className="form-field">
               <span>Password</span>
-              <input autoComplete={isRegistering ? 'new-password' : 'current-password'} maxLength="128" minLength={isRegistering ? 8 : undefined} onChange={(event) => setPassword(event.target.value)} placeholder={isRegistering ? 'At least 8 characters' : 'Enter your password'} required type="password" value={password} />
+              <div className="password-input-wrap">
+                <input autoComplete="current-password" maxLength="128" onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" required type={showPassword ? 'text' : 'password'} value={password} />
+                <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="password-toggle-button" onClick={() => setShowPassword((prev) => !prev)} title={showPassword ? 'Hide password' : 'Show password'} type="button">
+                  <Icon name={showPassword ? 'eyeOff' : 'eye'} size={16} />
+                </button>
+              </div>
             </label>}
-            {(isDetailsStep||isForgotReset) && <label className="form-field"><span>{isDetailsStep?'Password':'New password'}</span><input autoComplete="new-password" maxLength="128" minLength="8" onChange={(event)=>setPassword(event.target.value)} required type="password" value={password}/></label>}
-            {isDetailsStep && <label className="form-field"><span>Confirm password</span><input autoComplete="new-password" maxLength="128" minLength="8" onChange={(event)=>setConfirmPassword(event.target.value)} required type="password" value={confirmPassword}/></label>}
+            {(isDetailsStep||isForgotReset) && <label className="form-field">
+              <span>{isDetailsStep?'Password':'New password'}</span>
+              <div className="password-input-wrap">
+                <input autoComplete="new-password" maxLength="128" minLength="8" onChange={(event)=>setPassword(event.target.value)} placeholder="At least 8 characters" required type={showPassword ? 'text' : 'password'} value={password}/>
+                <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="password-toggle-button" onClick={() => setShowPassword((prev) => !prev)} title={showPassword ? 'Hide password' : 'Show password'} type="button">
+                  <Icon name={showPassword ? 'eyeOff' : 'eye'} size={16} />
+                </button>
+              </div>
+            </label>}
+            {isDetailsStep && <label className="form-field">
+              <span>Confirm password</span>
+              <div className="password-input-wrap">
+                <input autoComplete="new-password" maxLength="128" minLength="8" onChange={(event)=>setConfirmPassword(event.target.value)} placeholder="Re-enter your password" required type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword}/>
+                <button aria-label={showConfirmPassword ? 'Hide password' : 'Show password'} className="password-toggle-button" onClick={() => setShowConfirmPassword((prev) => !prev)} title={showConfirmPassword ? 'Hide password' : 'Show password'} type="button">
+                  <Icon name={showConfirmPassword ? 'eyeOff' : 'eye'} size={16} />
+                </button>
+              </div>
+            </label>}
             {success && !isRegistering && <p className="auth-success" role="status">{success}</p>}
             {error && <p className="auth-error" role="alert">{error}</p>}
             <button className="primary-button auth-submit" disabled={isSubmitting} type="submit">{isSubmitting ? 'Please wait...' : isEmailStep ? 'Send verification code' : isVerifying ? 'Verify code' : isDetailsStep ? 'Create account' : isForgotEmail?'Send reset code':isForgotReset?'Reset password':'Sign in'}<Icon name="arrow" size={16} /></button>

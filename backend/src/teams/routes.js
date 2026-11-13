@@ -201,19 +201,74 @@ router.post('/', async (request, response) => {
   }
 })
 
+router.post('/:teamId/members', async (request, response) => {
+  const teamId = parseResourceId(request.params.teamId, 'Team id')
+  const rawMemberIds = Array.isArray(request.body?.memberIds)
+    ? request.body.memberIds
+    : request.body?.memberId !== undefined
+      ? [request.body.memberId]
+      : []
+  if (!rawMemberIds.length || rawMemberIds.length > 50) {
+    throw new HttpError(400, 'Select at least 1 and no more than 50 registered members to add.')
+  }
+  const ids = rawMemberIds.map(Number)
+  if (ids.some((id) => !Number.isSafeInteger(id) || id < 1)
+    || new Set(ids).size !== ids.length
+    || ids.some((id) => String(id) === String(request.user.id))) {
+    throw new HttpError(400, 'Team members must be distinct registered users other than the team lead.')
+  }
+  const [teams] = await pool.execute('SELECT id, name FROM teams WHERE id = ? AND lead_id = ?', [teamId, request.user.id])
+  if (!teams.length) throw new HttpError(404, 'Team not found or you are not the team lead.')
+
+  const [users] = await pool.execute(`SELECT id FROM users WHERE id IN (${ids.map(() => '?').join(', ')})`, ids)
+  if (users.length !== ids.length) {
+    throw new HttpError(400, 'One or more selected team members do not exist.')
+  }
+
+  await pool.query(
+    `INSERT IGNORE INTO team_members (team_id, user_id) VALUES ${ids.map(() => '(?, ?)').join(', ')}`,
+    ids.flatMap((id) => [teamId, id]),
+  )
+
+  const updatedTeams = await findTeams(request.user.id)
+  response.status(200).json({ team: updatedTeams.find((team) => String(team.id) === String(teamId)) })
+})
+
 router.patch('/:teamId', async (request, response) => {
   const teamId = parseResourceId(request.params.teamId, 'Team id')
-  const name = request.body?.name
-  if (typeof name !== 'string' || !name.trim() || name.trim().length > 100) {
-    throw new HttpError(400, 'Team name is required and must be 100 characters or fewer.')
+  const { name, memberIds } = request.body ?? {}
+  const [teams] = await pool.execute('SELECT id, name FROM teams WHERE id = ? AND lead_id = ?', [teamId, request.user.id])
+  if (!teams.length) throw new HttpError(404, 'Team not found or you are not the team lead.')
+
+  if (name !== undefined) {
+    if (typeof name !== 'string' || !name.trim() || name.trim().length > 100) {
+      throw new HttpError(400, 'Team name is required and must be 100 characters or fewer.')
+    }
+    await pool.execute(
+      'UPDATE teams SET name = ? WHERE id = ? AND lead_id = ?',
+      [name.trim(), teamId, request.user.id],
+    )
   }
-  const [result] = await pool.execute(
-    'UPDATE teams SET name = ? WHERE id = ? AND lead_id = ?',
-    [name.trim(), teamId, request.user.id],
-  )
-  if (!result.affectedRows) throw new HttpError(404, 'Team not found or you are not the team lead.')
-  const teams = await findTeams(request.user.id)
-  response.json({ team: teams.find((team) => String(team.id) === String(teamId)) })
+
+  if (Array.isArray(memberIds) && memberIds.length > 0) {
+    const ids = memberIds.map(Number)
+    if (ids.some((id) => !Number.isSafeInteger(id) || id < 1)
+      || new Set(ids).size !== ids.length
+      || ids.some((id) => String(id) === String(request.user.id))) {
+      throw new HttpError(400, 'Team members must be distinct registered users other than the team lead.')
+    }
+    const [users] = await pool.execute(`SELECT id FROM users WHERE id IN (${ids.map(() => '?').join(', ')})`, ids)
+    if (users.length !== ids.length) {
+      throw new HttpError(400, 'One or more selected team members do not exist.')
+    }
+    await pool.query(
+      `INSERT IGNORE INTO team_members (team_id, user_id) VALUES ${ids.map(() => '(?, ?)').join(', ')}`,
+      ids.flatMap((id) => [teamId, id]),
+    )
+  }
+
+  const updatedTeams = await findTeams(request.user.id)
+  response.json({ team: updatedTeams.find((team) => String(team.id) === String(teamId)) })
 })
 
 router.delete('/:teamId', async (request, response) => {

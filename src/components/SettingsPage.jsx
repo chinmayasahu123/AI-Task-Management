@@ -1,6 +1,6 @@
 import Avatar from './Avatar'
 import Icon from './Icon'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './SettingsPage.css'
 import { requestJson } from '../api/client'
 
@@ -17,6 +17,20 @@ export default function SettingsPage({ user, isDarkMode, onToggleTheme, onEditPr
   const [isPhotoPreviewOpen, setIsPhotoPreviewOpen] = useState(false)
   const [passwordMessage,setPasswordMessage]=useState('')
   const [deletePassword,setDeletePassword]=useState('')
+
+  useEffect(() => {
+    if (!isPhotoPreviewOpen) return
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') setIsPhotoPreviewOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isPhotoPreviewOpen])
   async function changePassword(event){event.preventDefault();const form=new FormData(event.currentTarget);const currentPassword=form.get('currentPassword');const newPassword=form.get('newPassword');const confirm=form.get('confirmPassword');if(newPassword!==confirm){setPasswordMessage('New passwords do not match.');return}try{const result=await requestJson('/api/auth/password/change',{method:'POST',body:JSON.stringify({currentPassword,newPassword})});setPasswordMessage(result.message);event.currentTarget.reset()}catch(error){setPasswordMessage(error.message)}}
   async function deleteAccount(event){event.preventDefault();if(!window.confirm('Permanently delete your account, tasks, teams, notes, and profile data? This cannot be undone.'))return;try{await requestJson('/api/auth/account',{method:'DELETE',body:JSON.stringify({password:deletePassword})});await onLogout()}catch(error){setPasswordMessage(error.message)}}
   return (

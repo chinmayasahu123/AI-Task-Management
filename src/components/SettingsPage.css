@@ -38,11 +38,12 @@
 .settings-feature-5 .settings-feature-icon { color: #9067c4; background: #f3edfb; }
 .settings-feature-card h3 { margin: 1px 0 5px; color: #344057; font-size: 10px; font-weight: 750; }
 .settings-feature-card p { margin: 0; color: #8490a2; font-size: 9px; line-height: 1.55; }
-.settings-photo-backdrop { position: fixed; z-index: 12; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(10, 20, 36, 0.55); backdrop-filter: blur(5px); }
-.settings-photo-preview { position: relative; display: flex; width: fit-content; max-width: calc(100vw - 40px); height: fit-content; max-height: calc(100vh - 40px); align-items: center; justify-content: center; padding: 20px; border: 1px solid #e4eaf2; border-radius: 16px; background: #fff; box-shadow: 0 25px 70px rgba(10, 20, 36, 0.24); }
-.settings-photo-preview > .icon-button { position: absolute; top: 9px; right: 9px; }
-.settings-photo-large { width: 250px; height: 250px; border-width: 4px; font-size: 52px; }
-.settings-photo-full { display: block; max-width: min(75vw, 720px); max-height: min(78vh, 680px); width: auto; height: auto; border-radius: 8px; object-fit: contain; }
+.settings-photo-backdrop { position: fixed; z-index: 1000; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(10, 20, 36, 0.65); backdrop-filter: blur(6px); overflow: hidden; }
+.settings-photo-preview { position: relative; display: flex; flex-direction: column; width: auto; max-width: min(92vw, 380px); max-height: min(85vh, 440px); align-items: center; justify-content: center; padding: 16px; border: 1px solid #e4eaf2; border-radius: 16px; background: #fff; box-shadow: 0 25px 70px rgba(10, 20, 36, 0.3); overflow: hidden; box-sizing: border-box; }
+.settings-photo-preview > .icon-button { position: absolute; top: 10px; right: 10px; z-index: 2; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: rgba(15, 23, 42, 0.65); border: 0; cursor: pointer; }
+.settings-photo-preview > .icon-button:hover { background: rgba(15, 23, 42, 0.9); }
+.settings-photo-large { width: 220px; height: 220px; border-width: 4px; font-size: 52px; }
+.settings-photo-full { display: block; max-width: min(85vw, 340px); max-height: min(65vh, 360px); width: auto; height: auto; border-radius: 12px; object-fit: cover; }
 .app-shell[data-theme='dark'] .settings-profile-heading h2,
 .app-shell[data-theme='dark'] .settings-preferences h2,
 .app-shell[data-theme='dark'] .settings-section-heading h2,

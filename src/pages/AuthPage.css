@@ -115,6 +115,42 @@
   border-color: #6798f0;
 }
 
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 42px !important;
+}
+
+.password-toggle-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #8fa0ba;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.password-toggle-button:hover {
+  color: #e4edf8;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .auth-submit {
   min-height: 43px;
   margin-top: 3px;
